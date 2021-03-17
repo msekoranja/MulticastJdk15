@@ -10,7 +10,7 @@ public class MCReceive {
 	public static void main(String[] args) throws Throwable {
 		
 		MulticastSocket socket = new MulticastSocket(MCUtils.MC_PORT);
-		socket.setInterface(MCUtils.getMCNetowkInterfaceAddress());
+		socket.setInterface(MCUtils.getMCNetworkInterfaceAddress());
 		socket.joinGroup(MCUtils.getMCAddress());
 		
 		byte[] buffer = new byte[1500];		

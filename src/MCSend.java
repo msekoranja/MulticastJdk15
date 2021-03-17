@@ -10,7 +10,7 @@ public class MCSend {
 	public static void main(String[] args) throws Throwable {
 		
 		MulticastSocket socket = new MulticastSocket();
-		socket.setNetworkInterface(MCUtils.getMCNetowkInterface());
+		socket.setNetworkInterface(MCUtils.getMCNetworkInterface());
 		//socket.setTimeToLive(1);
 		
 		while (true) {

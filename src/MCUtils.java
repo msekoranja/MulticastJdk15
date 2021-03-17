@@ -42,7 +42,7 @@ public class MCUtils {
 		return firstLoopbackIf;
 	}
 	
-	public static NetworkInterface getMCNetowkInterface() throws SocketException, UnknownHostException {
+	public static NetworkInterface getMCNetworkInterface() throws SocketException, UnknownHostException {
 		//NetworkInterface netIf = NetworkInterface.getByName("lo");
 		NetworkInterface netIf = getFirstLoopbackNIF();
 		InetAddress netIfAddr = netIf.getInetAddresses().nextElement();
@@ -55,8 +55,8 @@ public class MCUtils {
 		return netIf;
 	}
 	
-	public static InetAddress getMCNetowkInterfaceAddress() throws SocketException, UnknownHostException {
-		return getMCNetowkInterface().getInetAddresses().nextElement();
+	public static InetAddress getMCNetworkInterfaceAddress() throws SocketException, UnknownHostException {
+		return getMCNetworkInterface().getInetAddresses().nextElement();
 	}
 
 }
