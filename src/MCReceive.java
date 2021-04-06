@@ -9,11 +9,13 @@ public class MCReceive {
 
 	public static void main(String[] args) throws Throwable {
 		
-		MulticastSocket socket = new MulticastSocket(MCUtils.MC_PORT);
+		// bind to MC address on VMS
+		MulticastSocket socket = new MulticastSocket(MCUtils.MC_GROUP);
+		//MulticastSocket socket = new MulticastSocket(MCUtils.MC_PORT);
 		socket.setInterface(MCUtils.getMCNetworkInterfaceAddress());
 		socket.joinGroup(MCUtils.getMCAddress());
 		
-		byte[] buffer = new byte[1500];		
+		byte[] buffer = new byte[1500];
 		while (true) {
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			socket.receive(packet);

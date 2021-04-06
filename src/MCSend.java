@@ -19,7 +19,7 @@ public class MCSend {
 					MCUtils.TEST_PACKET_DATA.length,
 					MCUtils.getMCAddress(), MCUtils.MC_PORT);
 			socket.send(packet);
-			System.out.println(System.currentTimeMillis() + ": packet set.");
+			System.out.println(System.currentTimeMillis() + ": packet sent.");
 			Thread.sleep(1000);
 		}
 	}
