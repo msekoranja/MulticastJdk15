@@ -86,16 +86,16 @@ public class MCForwarder {
 	public static void main(String[] args) throws Throwable {
 		
 		System.out.println("Binding to UDP socket at port " + MC_PORT);
-		DatagramSocket receiveSocket = new DatagramSocket(MC_PORT);
-		
-		MulticastSocket sendSocket = new MulticastSocket();
 
-		NetworkInterface loNif = MCForwarder.getFirstLoopbackNIF();
+		DatagramSocket receiveSocket = new DatagramSocket(MC_PORT);
 		
 		InetSocketAddress mcAddress = new InetSocketAddress(MC_ADDRESS, MC_PORT);
 		System.out.println("MC Group:   " + mcAddress);
+
+		NetworkInterface loNif = MCForwarder.getFirstLoopbackNIF();
 		System.out.println("MC Loopback Network IF: " + loNif);
 
+		MulticastSocket sendSocket = new MulticastSocket();
 		sendSocket.setNetworkInterface(loNif);
 
 		
@@ -193,9 +193,9 @@ public class MCForwarder {
 				responseFrom = new InetSocketAddress(responseFrom.getAddress(), port);
 
 			// 
-			// locally broadcast if unicast (qosCode & 0x80 == 0x80)
+			// locally broadcast ALL, not only if unicast (qosCode & 0x80 == 0x80)
 			//
-			if ((qosCode & 0x80) == 0x80)
+			//if ((qosCode & 0x80) == 0x80)
 			{
 				// clear unicast flag
 				receiveBuffer.put(4, (byte)(qosCode & ~0x80));
@@ -204,9 +204,13 @@ public class MCForwarder {
 				receiveBuffer.position(8);
 				MCForwarder.encodeAsIPv6Address(receiveBuffer, responseFrom.getAddress());
 				
-				System.out.println("Forwarding packet...");
-				packet.setAddress(mcAddress.getAddress());
-				packet.setPort(MC_PORT);
+				// need to recreate a new packet, otherwise send does not work
+				packet = new DatagramPacket(
+						packet.getData(), 
+						packet.getLength(),
+						mcAddress.getAddress(), MC_PORT);
+
+				System.out.println("Forwarding packet to: " + packet.getSocketAddress());
 				sendSocket.send(packet);
 			} 
 		}
