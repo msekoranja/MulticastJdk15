@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Enumeration;
 
-public class MCForwarder {
+public class PVAForwarder {
 
 	static {
 		System.setProperty("java.net.preferIPv4Stack", "true");
@@ -88,11 +88,16 @@ public class MCForwarder {
 		System.out.println("Binding to UDP socket at port " + MC_PORT);
 
 		DatagramSocket receiveSocket = new DatagramSocket(MC_PORT);
+		/*
+		DatagramSocket receiveSocket = new DatagramSocket(null);
+		receiveSocket.setReuseAddress(true);
+		receiveSocket.bind(new InetSocketAddress(MC_PORT));
+		*/
 		
 		InetSocketAddress mcAddress = new InetSocketAddress(MC_ADDRESS, MC_PORT);
 		System.out.println("MC Group:   " + mcAddress);
 
-		NetworkInterface loNif = MCForwarder.getFirstLoopbackNIF();
+		NetworkInterface loNif = PVAForwarder.getFirstLoopbackNIF();
 		System.out.println("MC Loopback Network IF: " + loNif);
 
 		MulticastSocket sendSocket = new MulticastSocket();
@@ -141,7 +146,11 @@ public class MCForwarder {
 			}
 			
 			// command ID and paylaod
-			receiveBuffer.get();
+			final byte commandId = receiveBuffer.get();
+			if (commandId != 3) {
+				System.out.println("Not a search request, ignoring... (ID: " + commandId + " != 3)");
+				continue;
+			}
 			final int payloadSize = receiveBuffer.getInt();
 			
 			// control message check (skip message)
@@ -186,6 +195,7 @@ public class MCForwarder {
 				return;
 			}
 
+			
 			// accept given address if explicitly specified by sender
 			if (!addr.isAnyLocalAddress())
 				responseFrom = new InetSocketAddress(addr, port);
@@ -198,11 +208,11 @@ public class MCForwarder {
 			//if ((qosCode & 0x80) == 0x80)
 			{
 				// clear unicast flag
-				receiveBuffer.put(4, (byte)(qosCode & ~0x80));
+				receiveBuffer.put(PVA_MESSAGE_HEADER_SIZE + 4, (byte)(qosCode & ~0x80));
 				
 				// update response address
-				receiveBuffer.position(8);
-				MCForwarder.encodeAsIPv6Address(receiveBuffer, responseFrom.getAddress());
+				receiveBuffer.position(PVA_MESSAGE_HEADER_SIZE + 8);
+				PVAForwarder.encodeAsIPv6Address(receiveBuffer, responseFrom.getAddress());
 				
 				// need to recreate a new packet, otherwise send does not work
 				packet = new DatagramPacket(
