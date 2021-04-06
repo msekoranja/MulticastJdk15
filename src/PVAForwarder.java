@@ -109,6 +109,9 @@ public class PVAForwarder {
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			receiveSocket.receive(packet);
 			InetSocketAddress responseFrom = (InetSocketAddress)packet.getSocketAddress();
+			if (responseFrom.getAddress().isLoopbackAddress()) {
+				continue;
+			}
 			
 			System.out.println("Received packet from: " + responseFrom);
 			
