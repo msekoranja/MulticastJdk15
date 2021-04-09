@@ -27,6 +27,7 @@ public class TCPClient {
 			} else {
 				System.out.println("no data");
 			}
+			Thread.sleep(5000);
 			socket.close();
 			System.out.println("done.");
 		} catch (Throwable th) {
